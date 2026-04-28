@@ -1,0 +1,20 @@
+pandas==2.2.2
+pyarrow==16.1.0
+numpy==1.26.4
+scikit-learn==1.5.0
+xgboost==2.0.3
+imbalanced-learn==0.12.3
+matplotlib==3.9.0
+seaborn==0.13.2
+shap==0.45.1
+joblib==1.4.2
+jupyter==1.0.0
+ipykernel==6.29.4
+python-docx==1.1.2
+
+# NOVOS (imagem)
+tensorflow==2.16.1
+opencv-python-headless==4.10.0.84
+kagglehub==0.2.7
+Pillow==10.3.0
+streamlit==1.36.0
