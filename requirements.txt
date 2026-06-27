@@ -18,3 +18,8 @@ opencv-python-headless==4.10.0.84
 kagglehub==0.2.7
 Pillow==10.3.0
 streamlit==1.36.0
+
+# NOVOS (Fase 2 — AG + LLM)
+pyyaml==6.0.1          # configs dos experimentos de AG
+requests==2.32.3       # cliente HTTP do Ollama (LLM local)
+pytest==8.2.2          # testes automatizados
