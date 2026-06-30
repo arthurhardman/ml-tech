@@ -1,8 +1,10 @@
-# Tech Challenge Fase 1 — Classificação de Desfecho Clínico em SRAG
+# Tech Challenge — Fase 1 e Fase 2 — SRAG
 
 **FIAP Pos-Tech — Machine Learning Engineering**
 
-Modelo de classificação para prever o desfecho clínico (cura vs óbito) de pacientes hospitalizados com Síndrome Respiratória Aguda Grave (SRAG), usando dados do SIVEP-Gripe do Ministério da Saúde.
+Projeto de classificação para prever o desfecho clínico (cura vs óbito) de pacientes hospitalizados com Síndrome Respiratória Aguda Grave (SRAG), usando dados do SIVEP-Gripe do Ministério da Saúde.
+
+Na **Fase 2**, o projeto foi estendido com otimização de hiperparâmetros via **Algoritmos Genéticos** e uma camada inicial de **LLM** para explicar as predições em linguagem natural.
 
 ---
 
@@ -42,18 +44,23 @@ tech-challenge-srag-v2/
 │   ├── 02_preprocessing.ipynb
 │   ├── 03_modeling.ipynb
 │   ├── 04_evaluation_interpretability.ipynb
-│   └── 05_image_validation.ipynb
+│   ├── 05_image_validation.ipynb
+│   ├── 06_genetic_optimization.ipynb
+│   └── 07_llm_interpretation.ipynb
 ├── src/
 │   ├── tabular/                # Módulos do pipeline sklearn/XGBoost
 │   │   ├── load_data.py
 │   │   ├── preprocessing.py
 │   │   ├── modeling.py
 │   │   └── evaluation.py
-│   └── image/                  # Módulos do pipeline TensorFlow/Keras
-│       ├── image_data.py
-│       ├── image_preprocessing.py
-│       ├── image_model.py
-│       └── image_evaluation.py
+│   ├── image/                  # Módulos do pipeline TensorFlow/Keras
+│   │   ├── image_data.py
+│   │   ├── image_preprocessing.py
+│   │   ├── image_model.py
+│   │   └── image_evaluation.py
+│   ├── genetic/                # Fase 2 — Algoritmo Genético
+│   ├── llm/                    # Fase 2 — Explicações com LLM
+│   └── monitoring/             # Fase 2 — Logs e histórico dos experimentos
 ├── results/
 │   ├── figures/                # Gráficos gerados (confusion matrix, ROC, SHAP)
 │   └── models/                 # Modelos serializados .pkl
@@ -107,6 +114,23 @@ python run_pipeline.py --no-grid    # Sem GridSearchCV (mais rápido)
 python run_pipeline.py --no-shap    # Sem SHAP (mais rápido)
 python run_pipeline.py --nrows 10000  # Subconjunto dos dados
 ```
+
+### Execução da Fase 2
+
+A Fase 2 parte dos artefatos gerados pelo pipeline tabular da Fase 1. Antes de rodar os notebooks novos, execute o pipeline pelo menos uma vez.
+
+```bash
+# Gera dados processados, modelos e figuras base
+python run_pipeline.py --no-grid --no-shap
+
+# Demonstração da otimização por Algoritmo Genético
+jupyter notebook notebooks/06_genetic_optimization.ipynb
+
+# Demonstração das explicações com LLM
+jupyter notebook notebooks/07_llm_interpretation.ipynb
+```
+
+A integração com LLM usa Ollama quando disponível. Se o Ollama não estiver rodando, o projeto usa modo de demonstração/mock para manter os testes e o fluxo de apresentação funcionando.
 
 ### Notebooks interativos
 
@@ -162,6 +186,24 @@ Todos otimizados com `GridSearchCV` + `StratifiedKFold(5)`, métrica: **F1-score
 | ROC-AUC | ✅ | — |
 | Matriz de confusão | ✅ | ✅ |
 | SHAP | ✅ | — |
+
+---
+
+## Fase 2 — Algoritmo Genético e LLM
+
+A otimização da Fase 2 foca no modelo **XGBoost**, porque ele foi o principal candidato da etapa tabular e tem hiperparâmetros bem adequados para busca evolutiva.
+
+O Algoritmo Genético trabalha com cromossomos que representam hiperparâmetros como `n_estimators`, `max_depth`, `learning_rate`, `subsample`, `colsample_bytree`, `gamma` e `scale_pos_weight`. A avaliação usa F1-score/recall para o desfecho de óbito, já que falsos negativos são especialmente sensíveis nesse tipo de problema.
+
+A parte de LLM recebe a predição, a probabilidade estimada e os principais fatores do caso para gerar uma explicação em português. A saída deixa claro que o modelo serve como apoio à triagem e não substitui a avaliação médica.
+
+Arquivos principais da Fase 2:
+
+- `src/genetic/`: codificação dos genes, operadores e otimizador.
+- `src/monitoring/`: histórico dos experimentos e curvas de convergência.
+- `src/llm/`: cliente da LLM, prompts e explicador.
+- `notebooks/06_genetic_optimization.ipynb`: execução dos experimentos com AG.
+- `notebooks/07_llm_interpretation.ipynb`: exemplos de explicações geradas.
 
 ---
 
